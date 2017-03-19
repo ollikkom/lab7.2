@@ -12,8 +12,8 @@ private:
         Element *pPrev;
         Element *pNext;
     } * Word;
-
 public:
+    static int counter;
     ~Text()
     {
         while (Word != nullptr){
@@ -24,7 +24,11 @@ public:
         }
     }
 
-    Text() :Word(nullptr) {}
+    Text() {
+        Word = nullptr;
+        counter = 0;
+    }
+
 
     void AddElem(const std::string str)
     {
@@ -106,6 +110,7 @@ public:
                 if (word != ""){
 
                     elem->AddElem(word);
+                    Text::counter++;
                     word = "";
                 }
             }
@@ -116,36 +121,36 @@ public:
         if (word != ""){
 
             elem->AddElem(word);
+            //Text::counter++;
         }
         return elem;
     }
 
-
-
+int Text::counter = 0;
 
 
 int main() {
-
+    //counter=0;
     std::ifstream fin;
     //if(!fin.is_open())
         //return -1;
     if (! File(fin)) return 0;
 
-    std::string strFind;
-    std::cout<<"FIND. Your word? ";
-    std::cin>>strFind;
-
-    size_t n = 0;
-    std::cout<<"OUTPUT. The range of output words? ";
-    std::cin>>n;
+        std::string strFind;
+       std::cout<<"FIND. Your word? ";
+        std::cin>>strFind;
+       size_t n = 0;
+       std::cout<<"OUTPUT. The range of output words? ";
+       std::cin>>n;
 
     std::string text;
-    while (getline(fin, text)){
-
+    while (getline(fin, text))
+    {
         Text* elemF = split(text);
         elemF->Print(std::cout, strFind, n);
         delete elemF;
     }
+    std::cout<< "\nNumber of coincidences: "<<Text::counter<< std::endl;
     fin.close();
     return 0;
 }
