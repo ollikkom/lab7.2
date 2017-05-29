@@ -1,8 +1,9 @@
 #include <iostream>
 #include <fstream>
-#include <string>
+#include <cstring>
+#include <vector>
 #include "ctype.h"
-
+#include "map"
 
 class Text{
 
@@ -12,6 +13,10 @@ private:
         Element *pPrev;
         Element *pNext;
     } * Word;
+    struct WordElem{
+        std::string str;
+        int count;
+    };
 public:
     static int counter;
     ~Text()
@@ -123,6 +128,17 @@ public:
             elem->AddElem(word);
             //Text::counter++;
         }
+        std::map<std::string, size_t> slova;
+        for (int i = 0; i < str.size(); i++) {
+            if(slova.find(str)== slova.end())
+            {
+                slova[str]= 0;
+            }
+            else{
+                slova[str]++;
+            }
+        }
+
         return elem;
     }
 
@@ -144,13 +160,42 @@ int main() {
        std::cin>>n;
 
     std::string text;
+
+    std::vector<std::string> ptr;
+    const int N = 2;
+
+    for (int i=0; i<N; i++) {
+        std::string str;
+        std::cin >> str;
+        ptr.push_back(str);
+    }
+    for (int i=0; i<ptr.size(); i++) {
+        std::cout  << ptr[i] << std::endl; // покажем что содержится в ptr
+    }
+
     while (getline(fin, text))
     {
         Text* elemF = split(text);
         elemF->Print(std::cout, strFind, n);
         delete elemF;
     }
-    std::cout<< "\nNumber of coincidences: "<<Text::counter<< std::endl;
+
+//    std::map<std::string, size_t> slova;
+//    while (getline(fin, text))
+//    {
+//        Text* elemF = split(text);
+//        while (elemF != nullptr) {
+//            if(slova.find()== slova.end())
+//                {
+//                    slova[]= 0;
+//                }
+//            else{
+//                slova[]++;
+//            }
+//        }
+//    }
+
+    //std::cout<< "\nNumber of coincidences: "<<Text::counter<< std::endl;
     fin.close();
     return 0;
 }
