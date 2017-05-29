@@ -1,201 +1,89 @@
 #include <iostream>
+#include <string>
 #include <fstream>
-#include <cstring>
 #include <vector>
-#include "ctype.h"
-#include "map"
+#include <map>
 
-class Text{
+void print(const std::vector<std::string> &vect, const std::string &str, size_t count) {
+    for (size_t i = 0; i < vect.size(); i++) {
+        if (vect[i] == str) {
+            if (count < i) {
+                for (size_t j = i - count; j < i; j++)
+                    std::cout << vect[j] << " ";
+            } else {
 
-private:
-    struct Element{
-        std::string str;
-        Element *pPrev;
-        Element *pNext;
-    } * Word;
-    struct WordElem{
-        std::string str;
-        int count;
-    };
-public:
-    static int counter;
-    ~Text()
-    {
-        while (Word != nullptr){
+                for (size_t j = 0; j < i; j++)
+                    std::cout << vect[j] << " ";
+            }
 
-            Element *pNext = Word->pNext;
-            delete Word;
-            Word = pNext;
+            std::cout << vect[i] << " ";
+
+            for (size_t j = i + 1; j <= i + count; j++) {
+                if (j == vect.size())
+                    break;
+                std::cout << vect[j] << " ";
+            }
+
+            std::cout << std::endl;
         }
     }
-
-    Text() {
-        Word = nullptr;
-        counter = 0;
-    }
-
-
-    void AddElem(const std::string str)
-    {
-        if (Word == nullptr){
-
-            Word = new Element;
-            Word->str = str;
-            Word->pNext = nullptr;
-            Word->pPrev = nullptr;
-            return;
-        }
-
-        Element *Last = Word;
-        while( Last->pNext != nullptr){
-
-            Last= Last->pNext;
-        }
-        Last->pNext = new Element;
-        Last->pNext->str = str;
-        Last->pNext->pNext = nullptr;
-        Last->pNext->pPrev = Last;
-    }
-
-    void Print(std::ostream & stream, const std::string & str1, size_t n)
-    {
-        Element *Last = Word;
-        while (Last != nullptr) {
-            if (Last->str == str1){
-
-                Element * FindWord = Last;
-                size_t i = 0;
-                while (FindWord->pPrev != nullptr && i < n){
-
-                    FindWord = FindWord->pPrev;
-                    i++;
-                }
-                for (size_t j = 0; j < i + 1 + n; j++){
-
-                    if (FindWord == nullptr) break;
-                    stream << FindWord->str << " ";
-                    FindWord = FindWord->pNext;
-                }
-                stream << std::endl;
-
-            }
-            Last = Last->pNext;
-        }
-    }
-};
-
-    bool File(std::ifstream & fin)
-    {
-        std::string ff;
-        std::cout<<"Your FILE: ";
-        do
-        {
-            std::cin>>ff;
-            if (ff == "null") return false;
-            fin.open(ff, std::ios_base::in);
-            if (fin.is_open()){
-
-                return true;
-            }
-            else{
-                std::cout << "Error! Other ?FILE? or enter 'null' to exit:" << std::endl;
-            }
-        }
-        while (true);
-    }
-
-    Text* split(std::string & str)
-    {
-        Text* elem = new Text;
-        std::string word = "";
-        for (size_t i = 0; i < str.size(); i++){
-
-            if (ispunct(str[i]) or str[i] == ' '){
-
-                if (word != ""){
-
-                    elem->AddElem(word);
-                    Text::counter++;
-                    word = "";
-                }
-            }
-            else{
-                word += str[i];
-            }
-        }
-        if (word != ""){
-
-            elem->AddElem(word);
-            //Text::counter++;
-        }
-        std::map<std::string, size_t> slova;
-        for (int i = 0; i < str.size(); i++) {
-            if(slova.find(str)== slova.end())
-            {
-                slova[str]= 0;
-            }
-            else{
-                slova[str]++;
-            }
-        }
-
-        return elem;
-    }
-
-int Text::counter = 0;
-
+}
 
 int main() {
-    //counter=0;
     std::ifstream fin;
-    //if(!fin.is_open())
-        //return -1;
-    if (! File(fin)) return 0;
+    std::string File;
 
-        std::string strFind;
-       std::cout<<"FIND. Your word? ";
-        std::cin>>strFind;
-       size_t n = 0;
-       std::cout<<"OUTPUT. The range of output words? ";
-       std::cin>>n;
+    std::cout << "FILE name: " << std::endl;
+    std::cin >> File;
+    fin.open(File, std::ios_base::in);
 
-    std::string text;
+    if (fin.is_open()) {
+        std::string Findword;
+        std::cout << "Find words:" << std::endl;
+        std::cin >> Findword;
 
-    std::vector<std::string> ptr;
-    const int N = 2;
+        size_t n = 0;
+        std::cout << "N = " << std::endl;
+        std::cin >> n;
 
-    for (int i=0; i<N; i++) {
-        std::string str;
-        std::cin >> str;
-        ptr.push_back(str);
+        std::map<std::string, size_t> check;
+
+        std::string buf;
+        while (getline(fin, buf)) {
+            std::vector<std::string> slova;
+
+            std::string buf2;
+            for (size_t i = 0; i < buf.size(); i++) {
+                if (ispunct(buf[i]) || buf[i] == ' ') {
+                    if (!buf2.empty()) {
+                        slova.push_back(buf2);
+                        buf2.clear();
+                    }
+                } else {
+                    buf2 += buf[i];
+                }
+            }
+            if (!buf2.empty())
+                slova.push_back(buf2);
+
+
+            for (size_t i = 0; i < slova.size(); i++) {
+                if (check.find(slova[i]) == check.end()) {
+                    check[slova[i]] = 1;
+                } else {
+                    ++check[slova[i]];
+                }
+            }
+
+            print(slova, Findword, n);
+        }
+        std::cout << std::endl;
+
+        for (auto &at : check) {
+            std::cout << at.first << " " << at.second << std::endl;
+        }
+
+        fin.close();
     }
-    for (int i=0; i<ptr.size(); i++) {
-        std::cout  << ptr[i] << std::endl; // покажем что содержится в ptr
-    }
-
-    while (getline(fin, text))
-    {
-        Text* elemF = split(text);
-        elemF->Print(std::cout, strFind, n);
-        delete elemF;
-    }
-
-//    std::map<std::string, size_t> slova;
-//    while (getline(fin, text))
-//    {
-//        Text* elemF = split(text);
-//        while (elemF != nullptr) {
-//            if(slova.find()== slova.end())
-//                {
-//                    slova[]= 0;
-//                }
-//            else{
-//                slova[]++;
-//            }
-//        }
-//    }
-
-    //std::cout<< "\nNumber of coincidences: "<<Text::counter<< std::endl;
-    fin.close();
     return 0;
 }
